@@ -3,21 +3,24 @@ const cors = require('cors');
 require('dotenv').config();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+// --- Проверка наличия API ключа при старте ---
 if (!process.env.GEMINI_API_KEY) {
   console.error('КРИТИЧЕСКАЯ ОШИБКА: Переменная GEMINI_API_KEY не найдена в .env файле.');
-  process.exit(1); 
+  process.exit(1);
 }
 
 const app = express();
 const port = process.env.PORT || 3001;
 
+// --- ИСПРАВЛЕННАЯ НАСТРОЙКА CORS ---
 const corsOptions = {
-  origin: 'https://meta-idea-backend.netlify.app', 
+  // Я взял правильный адрес вашего сайта прямо из вашей ошибки
+  origin: 'https://bespoke-pithivier-d06a85.netlify.app', 
   optionsSuccessStatus: 200 
 };
 
-app.use(cors(corsOptions)); 
-app.use(express.json()); 
+app.use(cors(corsOptions)); // Используем настроенный cors
+app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
