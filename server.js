@@ -5,14 +5,19 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 if (!process.env.GEMINI_API_KEY) {
   console.error('КРИТИЧЕСКАЯ ОШИБКА: Переменная GEMINI_API_KEY не найдена в .env файле.');
-  process.exit(1);
+  process.exit(1); 
 }
 
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.use(cors());
-app.use(express.json());
+const corsOptions = {
+  origin: 'https://meta-idea-backend.netlify.app', 
+  optionsSuccessStatus: 200 
+};
+
+app.use(cors(corsOptions)); 
+app.use(express.json()); 
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
@@ -21,13 +26,12 @@ app.post('/api/generate', async (req, res) => {
   try {
     const { step0, step1, step2 } = req.body;
 
-    // Валидация всех входящих данных
     if (!step0 || !step1 || !step2 || !Array.isArray(step2)) {
       return res.status(400).json({ error: 'Ошибка валидации: неполные или некорректные данные.' });
     }
 
     const prompt = `
-      Ты — элитный бренд-стратег и провокационный копирайтер, известный своей способностью создавать новые рыночные категории. Твой стиль — острый, лаконичный и невероятно точный. Твоя задача — проанализировать данные от эксперта и предложить 3 кардинально разных, но одинаково сильных варианта мета-идеи, полностью адаптированных под его контекст.
+      Ты — элитный бренд-стратег и провокационный копирайтер, известный своей способностью создавать новые рыночные категории, а не просто конкурировать в существующих. Твой стиль — острый, лаконичный, смелый и невероятно точный. Твоя задача — проанализировать данные от эксперта и предложить 3 кардинально разных, но одинаково сильных варианта мета-идеи, полностью адаптированных под его контекст.
 
       ### КОНТЕКСТ ЭКСПЕРТА
       - **Сфера:** ${step0.field}
@@ -70,5 +74,5 @@ app.post('/api/generate', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Сервер запущен на http://localhost:${port}`);
+  console.log(`Сервер запущен на порту ${port}`);
 });
